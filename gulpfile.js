@@ -35,14 +35,6 @@ gulp.task('copy-vendor', () => {
     .pipe(debug({title: "copy bootstrap"}))
     .pipe(gulp.dest('vendor/bootstrap'));
     console.log('- copied bootstrap files');
-
-    // bootstrap
-    gulp.src([
-        'node_modules/parsleyjs/dist/**.js'
-    ])
-    .pipe(debug({title: "copy parsleyjs"}))
-    .pipe(gulp.dest('vendor/parsleyjs'));
-    console.log('- copied parsleyjs files');
 });
 
 gulp.task('clear-vendor', () => {
@@ -50,7 +42,6 @@ gulp.task('clear-vendor', () => {
         'vendor/bootstrap/**',
         'vendor/jquery/**',
         'vendor/popper.js/**',
-        'vendor/parsleyjs/**',
         '!vendor'
     ]);
 });
