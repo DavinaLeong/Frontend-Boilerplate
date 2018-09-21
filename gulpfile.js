@@ -1,9 +1,12 @@
-const gulp = require('gulp');
-const debug = require('gulp-debug');
-const del = require('del');
-const eventStream = require('event-stream');
+const gulp          = require('gulp');
+const gulpIf        = require('gulp-if');
+const debug         = require('gulp-debug');
+const del           = require('del');
+const eventStream   = require('event-stream');
 
-const paths = {
+const config    = require('./config');
+
+const paths     = {
     sep: '/',
     root: './',
     nodeModules: './node_modules',
@@ -22,7 +25,7 @@ const paths = {
     }
 };
 
-const tasks = {
+const tasks     = {
     default: 'default',
     copy: 'copy',
     del: 'del'
@@ -68,38 +71,29 @@ gulp.task(tasks.copy, () => {
                 `${paths.nodeModules}/parsleyjs/src/parsley.css`,
                 `${paths.nodeModules}/parsleyjs/dist/**.*`
             ])
-            .pipe(debug({ title: "--- copied ParsleyJS scripts" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.pjs}`)),
+            .pipe(gulpIf(config.parsley, gulp.dest(`${paths.dist.vendor.pjs}`))),
 
         //DataTables
-        gulp.src(`${paths.nodeModules}/dataTables.net/js/**.*`)
-            .pipe(debug({ title: "--- copied DataTables scripts" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/js`)),
-        gulp.src(`${paths.nodeModules}/dataTables.net-responsive/js/**.*`)
-            .pipe(debug({ title: "--- copied DataTables responsive scripts" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/js`)),
-        gulp.src(`${paths.nodeModules}/dataTables.net-bs4/css/**.*`)
-            .pipe(debug({ title: "--- copied DataTables BS4 styles" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/css`)),
-        gulp.src(`${paths.nodeModules}/dataTables.net-bs4/js/**.*`)
-            .pipe(debug({ title: "--- copied DataTables BS4 scripts" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/js`)),
-        gulp.src(`${paths.nodeModules}/dataTables.net-responsive-bs4/css/**.*`)
-            .pipe(debug({ title: "--- copied DataTables responsive BS4 styles" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/css`)),
-        gulp.src(`${paths.nodeModules}/dataTables.net-responsive-bs4/js/**.*`)
-            .pipe(debug({ title: "--- copied DataTables responsive BS4 scripts" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/js`)),
+        gulp.src([
+                `${paths.nodeModules}/dataTables.net-bs4/css/**.*`,
+                `${paths.nodeModules}/dataTables.net-responsive-bs4/css/**.*`
+            ])
+            .pipe(gulpIf(config.dataTables, gulp.dest(`${paths.dist.vendor.dtb}/css`))),
+        gulp.src([
+                `${paths.nodeModules}/dataTables.net/js/**.*`,
+                `${paths.nodeModules}/dataTables.net-responsive/js/**.*`,
+                `${paths.nodeModules}/dataTables.net-bs4/js/**.*`,
+                `${paths.nodeModules}/dataTables.net-responsive-bs4/js/**.*`
+            ])
+            .pipe(gulpIf(config.dataTables, gulp.dest(`${paths.dist.vendor.dtb}/js`))),
 
         //Moment
         gulp.src(`${paths.nodeModules}/moment/min/**.*`)
-            .pipe(debug({ title: "--- copied Moment scripts" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.mmt}`)),
+            .pipe(gulpIf(config.datetimePicker, gulp.dest(`${paths.dist.vendor.mmt}`))),
 
         //PrismJS
         gulp.src(`${paths.nodeModules}/prismjs/**/*.{css,js}`)
-            .pipe(debug({ title: "--- copied PrismJS" }))
-            .pipe(gulp.dest(`${paths.dist.vendor.prjs}`))
+            .pipe(gulpIf(config.prism, gulp.dest(`${paths.dist.vendor.prjs}`)))
     ]);
 });
 
