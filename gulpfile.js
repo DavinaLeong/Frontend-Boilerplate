@@ -1,47 +1,110 @@
-const PATHS = {
-    nodeModules: "node_modules/",
-    vendor: "vendor/"
+const gulp = require('gulp');
+const debug = require('gulp-debug');
+const del = require('del');
+const eventStream = require('event-stream');
+
+const paths = {
+    sep: '/',
+    root: './',
+    nodeModules: './node_modules',
+    dist: {
+        dir: './dist',
+        vendor: {
+            dir:    './dist/vendor',
+            fa:     './dist/vendor/fontawesome',
+            bs:     './dist/vendor/bootstrap',
+            jq:     './dist/vendor/jquery',
+            pjs:    './dist/vendor/parsleyjs',
+            dtb:    './dist/vendor/dataTables',
+            mmt:    './dist/vendor/momentjs',
+            prjs:   './dist/vendor/prismjs'
+        }
+    }
 };
 
-let gulp = require("gulp");
-let del = require("del");
-let debug = require("gulp-debug");
+const tasks = {
+    default: 'default',
+    copy: 'copy',
+    del: 'del'
+};
 
-gulp.task("default", ["vendor"]);
+gulp.task(tasks.default, [tasks.del, tasks.copy]);
 
-gulp.task("vendor", ["clear-vendor", "copy-vendor"]);
+gulp.task(tasks.copy, () => {
+    return eventStream.merge([
+        // Font Awesome
+        gulp.src(`${paths.nodeModules}/@fortawesome/fontawesome-free/js/*.js`)
+            .pipe(debug({ title: "--- copied FontAwesome 5 Free scripts" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.fa}/js`)),
+        gulp.src(`${paths.nodeModules}/@fortawesome/fontawesome-free/svgs/**/*.svg`)
+            .pipe(debug({ title: "--- copied FontAwesome 5 Free SVGs" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.fa}/svgs`)),
 
-gulp.task('copy-vendor', () => {
-    // jquery
-    gulp.src([
-        'node_modules/jquery/dist/**'
-    ])
-    .pipe(debug({title: "copy jquery"}))
-    .pipe(gulp.dest('vendor/jquery'));
-    console.log('- copied jquery files');
+        //Bootstrap
+        gulp.src([
+            `${paths.nodeModules}/bootstrap/dist/css/bootstrap.css`,
+                `${paths.nodeModules}/bootstrap/dist/css/bootstrap.css.map`,
+                `${paths.nodeModules}/bootstrap/dist/css/bootstrap.min.css`,
+                `${paths.nodeModules}/bootstrap/dist/css/bootstrap.min.css.map`
+            ])
+            .pipe(debug({ title: "--- copied Bootstrap 4 styles" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.bs}/css`)),
+        gulp.src([
+            `${paths.nodeModules}/bootstrap/dist/js/bootstrap.bundle.js`,
+                `${paths.nodeModules}/bootstrap/dist/js/bootstrap.bundle.js.map`,
+                `${paths.nodeModules}/bootstrap/dist/js/bootstrap.bundle.min.js`,
+                `${paths.nodeModules}/bootstrap/dist/js/bootstrap.bundle.min.js.map`
+            ])
+            .pipe(debug({ title: "--- copied Bootstrap 4 bundle scripts" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.bs}/js`)),
 
-    // popper.js
-    gulp.src([
-        'node_modules/popper.js/dist/**'
-    ])
-    .pipe(debug({title: "copy popper.js"}))
-    .pipe(gulp.dest('vendor/popper.js'));
-    console.log('- copied popper.js files');
+        //jQuery
+        gulp.src(`${paths.nodeModules}/jquery/dist/**.*`)
+            .pipe(debug({ title: "--- copied jQuery scripts" }))
+            .pipe(gulp.dest(paths.dist.vendor.jq)),
 
-    // bootstrap
-    gulp.src([
-        'node_modules/bootstrap/dist/**'
-    ])
-    .pipe(debug({title: "copy bootstrap"}))
-    .pipe(gulp.dest('vendor/bootstrap'));
-    console.log('- copied bootstrap files');
+        //Parsley
+        gulp.src([
+                `${paths.nodeModules}/parsleyjs/src/parsley.css`,
+                `${paths.nodeModules}/parsleyjs/dist/**.*`
+            ])
+            .pipe(debug({ title: "--- copied ParsleyJS scripts" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.pjs}`)),
+
+        //DataTables
+        gulp.src(`${paths.nodeModules}/dataTables.net/js/**.*`)
+            .pipe(debug({ title: "--- copied DataTables scripts" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/js`)),
+        gulp.src(`${paths.nodeModules}/dataTables.net-responsive/js/**.*`)
+            .pipe(debug({ title: "--- copied DataTables responsive scripts" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/js`)),
+        gulp.src(`${paths.nodeModules}/dataTables.net-bs4/css/**.*`)
+            .pipe(debug({ title: "--- copied DataTables BS4 styles" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/css`)),
+        gulp.src(`${paths.nodeModules}/dataTables.net-bs4/js/**.*`)
+            .pipe(debug({ title: "--- copied DataTables BS4 scripts" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/js`)),
+        gulp.src(`${paths.nodeModules}/dataTables.net-responsive-bs4/css/**.*`)
+            .pipe(debug({ title: "--- copied DataTables responsive BS4 styles" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/css`)),
+        gulp.src(`${paths.nodeModules}/dataTables.net-responsive-bs4/js/**.*`)
+            .pipe(debug({ title: "--- copied DataTables responsive BS4 scripts" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.dtb}/js`)),
+
+        //Moment
+        gulp.src(`${paths.nodeModules}/moment/min/**.*`)
+            .pipe(debug({ title: "--- copied Moment scripts" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.mmt}`)),
+
+        //PrismJS
+        gulp.src(`${paths.nodeModules}/prismjs/**/*.{css,js}`)
+            .pipe(debug({ title: "--- copied PrismJS" }))
+            .pipe(gulp.dest(`${paths.dist.vendor.prjs}`))
+    ]);
 });
 
-gulp.task('clear-vendor', () => {
-    del.sync([
-        'vendor/bootstrap/**',
-        'vendor/jquery/**',
-        'vendor/popper.js/**',
-        '!vendor'
+gulp.task(tasks.del, () => {
+    return del.sync([
+        `${paths.dist.vendor.dir}/**/*.*`
     ]);
 });
