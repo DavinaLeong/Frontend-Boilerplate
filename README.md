@@ -1,4 +1,4 @@
-# Frontend Boilerplate
+# Frontend Boilerplate (Old)
 This repo is intended to be the starting point for all frontend projects.
 
 To view the pages as they are, simply run this command in your console/terminal:
